@@ -5,21 +5,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import SaveProgressButton from "@/components/SaveProgressButton";
 import ShareStoryButton from "@/components/ShareStoryButton";
-import Leaderboard from "@/components/Leaderboard";
 import WritingPrompt from "@/components/WritingPrompt";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const Index = () => {
   const [text, setText] = useState("");
   const [isWriting, setIsWriting] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [scores, setScores] = useState([
-    { name: "Alice", points: 120 },
-    { name: "Bob", points: 100 },
-    { name: "Charlie", points: 80 },
-  ]);
   const [prompt, setPrompt] = useState("Write about a time you overcame a challenge.");
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const prompts = [
+    "Write about a time you overcame a challenge.",
+    "Describe your favorite childhood memory.",
+    "Write a story set in a futuristic world.",
+    "Describe a day in the life of your pet.",
+    "Write about a time you felt truly happy.",
+    "Imagine you have a superpower. What is it and how do you use it?",
+    "Write a letter to your future self.",
+    "Describe your dream vacation.",
+    "Write about a time you helped someone in need.",
+    "Imagine you are an astronaut. Describe your journey to a new planet."
+  ];
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -48,8 +56,26 @@ const Index = () => {
     localStorage.setItem("story", text);
   };
 
+  const handleStartWriting = () => {
+    setShowOnboarding(false);
+    setPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center space-y-4 p-4">
+      {showOnboarding && (
+        <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Welcome to Keep Writing!</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p>Your task is to write a short story. If you stop writing for 5 seconds, all of your progress will be deleted. Keep your fingers moving and your creativity flowing!</p>
+              <Button onClick={handleStartWriting}>Start Writing</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
       <WritingPrompt prompt={prompt} />
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -78,8 +104,6 @@ const Index = () => {
       <Tabs defaultValue="tutorial" className="w-full max-w-2xl">
         <TabsList>
           <TabsTrigger value="tutorial">Tutorial</TabsTrigger>
-          <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
-          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
         <TabsContent value="tutorial">
           <Card>
@@ -90,24 +114,6 @@ const Index = () => {
               <p>Welcome to Keep Writing! Your task is to write a short story. If you stop writing for 5 seconds, all of your progress will be deleted. Keep your fingers moving and your creativity flowing!</p>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="roadmap">
-          <Card>
-            <CardHeader>
-              <CardTitle>Roadmap</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5">
-                <li>Feature 1: Save progress</li>
-                <li>Feature 2: Share stories</li>
-                <li>Feature 3: Leaderboards</li>
-                <li>Feature 4: Writing prompts</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="leaderboard">
-          <Leaderboard scores={scores} />
         </TabsContent>
       </Tabs>
       <ToastContainer />
