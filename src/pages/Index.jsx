@@ -3,11 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import SaveProgressButton from "@/components/SaveProgressButton";
+import ShareStoryButton from "@/components/ShareStoryButton";
+import Leaderboard from "@/components/Leaderboard";
+import WritingPrompt from "@/components/WritingPrompt";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Index = () => {
   const [text, setText] = useState("");
   const [isWriting, setIsWriting] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [scores, setScores] = useState([
+    { name: "Alice", points: 120 },
+    { name: "Bob", points: 100 },
+    { name: "Charlie", points: 80 },
+  ]);
+  const [prompt, setPrompt] = useState("Write about a time you overcame a challenge.");
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -32,8 +44,13 @@ const Index = () => {
     setIsWriting(false);
   };
 
+  const handleSave = () => {
+    localStorage.setItem("story", text);
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center space-y-4 p-4">
+      <WritingPrompt prompt={prompt} />
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-center text-3xl">Keep Writing</CardTitle>
@@ -54,10 +71,15 @@ const Index = () => {
           )}
         </CardContent>
       </Card>
+      <div className="flex space-x-4">
+        <SaveProgressButton onSave={handleSave} />
+        <ShareStoryButton story={text} />
+      </div>
       <Tabs defaultValue="tutorial" className="w-full max-w-2xl">
         <TabsList>
           <TabsTrigger value="tutorial">Tutorial</TabsTrigger>
           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
         <TabsContent value="tutorial">
           <Card>
@@ -84,7 +106,11 @@ const Index = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="leaderboard">
+          <Leaderboard scores={scores} />
+        </TabsContent>
       </Tabs>
+      <ToastContainer />
     </div>
   );
 };
